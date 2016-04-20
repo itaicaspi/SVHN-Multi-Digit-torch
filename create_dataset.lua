@@ -39,17 +39,17 @@ local validationSize = 5000
 local train_dir = 'train/'
 local train_zip = './train.zip'
 local train_labels = './train_labels.txt'
-local train_url = "https://www.terminet.xyz/datasets/train.zip"
+local train_url = "https://www.deep-ai.xyz/datasets/train.zip"
 
 local extra_dir = 'extra/'
 local extra_zip = './extra.zip'
 local extra_labels = './extra_labels.txt'
-local extra_url = "https://www.terminet.xyz/datasets/extra.zip"
+local extra_url = "https://www.deep-ai.xyz/datasets/extra.zip"
 
 local test_dir = 'test/'
 local test_zip = './test.zip'
 local test_labels = './test_labels.txt'
-local test_url = "https://www.terminet.xyz/datasets/test.zip"
+local test_url = "https://www.deep-ai.xyz/datasets/test.zip"
 
 local trainSetPath = 'train.t7'
 local validSetPath = 'validation.t7'

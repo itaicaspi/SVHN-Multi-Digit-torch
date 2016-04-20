@@ -14,14 +14,14 @@ cmd:text()
 cmd:text('SVHN Training/Optimization')
 cmd:text()
 cmd:text('Options:')
-cmd:option('-save', 'results/model1.net', 'subdirectory to save/log experiments in')
-cmd:option('-load', 'results/model1.net', 'load saved model as starting point')
+cmd:option('-save', 'results/model.net', 'subdirectory to save/log experiments in')
+cmd:option('-load', '', 'load saved model as starting point')
 cmd:option('-optimization', 'SGD', 'optimization method: SGD | NAG')
 cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
 cmd:option('-batchSize', 50, 'mini-batch size (1 = pure stochastic)')
 cmd:option('-epochs', 500, 'number of epochs')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
-cmd:option('-momentum', 0.9, 'momentum (SGD only)')
+cmd:option('-momentum', 0.9, 'momentum (SGD only)') 
 cmd:option('-type', 'cuda', 'use cuda')
 cmd:option('-transfer', 'relu', 'activation function, options are: elu, relu')
 cmd:text()
@@ -37,11 +37,11 @@ local function convLayer(nInput, nOutput, stride)
 	local padW = (kW - 1)/2
 	local padH = (kH - 1)/2
 	local layer = nn.Sequential()
-	layer:add(cudnn.SpatialConvolution(nInput, nOutput, kW, kH, 1, 1, padW, padH))
-	layer:add(cudnn.SpatialMaxPooling(2, 2, stride, stride, 1, 1))
-	layer:add(cudnn.SpatialBatchNormalization(nOutput))
-	layer:add(cudnn.ReLU())
-	--layer:add(nn.Dropout(0.5))
+	layer:add(nn.SpatialConvolution(nInput, nOutput, kW, kH, 1, 1, padW, padH))
+	layer:add(nn.SpatialMaxPooling(2, 2, stride, stride, 1, 1))
+	layer:add(nn.SpatialBatchNormalization(nOutput))
+	layer:add(nn.ReLU())
+	layer:add(nn.Dropout(0.2))
 	if opt.type == 'cuda' then
     return layer:cuda()
   else
@@ -110,10 +110,10 @@ optimMethod = optim.sgd
 
 
 -- loading datasets
-trainSetPath = 'test.t7'
+trainSetPath = 'train.t7'
 trainSet = torch.checkpoint(trainSetPath) 
 trainSize = trainSet.labels:size()[1]
-testSetPath = 'validation.t7'
+testSetPath = 'test.t7'
 testSet = torch.checkpoint(testSetPath) 
 testSize = testSet.labels:size()[1]
 
@@ -229,10 +229,18 @@ local function train()
       
       -- get error from criterion for length net
 			local gradInput = {}
-      gradInput[1] = torch.Tensor(opt.batchSize, lengthClasses):zero():cuda() -- TODO: as a paremeter
-      for i = 1,maxDigits do
-        gradInput[i+1] = torch.Tensor(opt.batchSize, 10):zero():cuda() -- TODO: as a parameter
+      if opt.type == 'cuda' then
+        gradInput[1] = torch.Tensor(opt.batchSize, lengthClasses):zero():cuda()
+        for i = 1,maxDigits do
+          gradInput[i+1] = torch.Tensor(opt.batchSize, 10):zero():cuda()
+        end
+      else
+        gradInput[1] = torch.Tensor(opt.batchSize, lengthClasses):zero()
+        for i = 1,maxDigits do
+          gradInput[i+1] = torch.Tensor(opt.batchSize, 10):zero()
+        end
       end
+      
       --print(targets)
       for b = 1, opt.batchSize do
         -- get gradients for the length tower
