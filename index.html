@@ -1,25 +1,34 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
   <head>
-    <meta charset="UTF-8">
-    <title>Multi-Digit Number Extraction from Images Using Deep Learning for Torch by itaicaspi</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Multi-Digit Number Extraction from Images Using Deep Learning for Torch</h1>
-      <h2 class="project-tagline">Torch implementation of Multi-digit Number Recognition from Street View Imagery using Deep Convolutional Neural Networks (http://arxiv.org/pdf/1312.6082.pdf)</h2>
-      <a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch" class="btn">View on GitHub</a>
-      <a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
-    <section class="main-content">
-      <h3>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Multi-Digit Number Extraction from Images Using Deep Learning for Torch by itaicaspi</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Multi-Digit Number Extraction from Images Using Deep Learning for Torch</h1>
+        <h2>Torch implementation of Multi-digit Number Recognition from Street View Imagery using Deep Convolutional Neural Networks (http://arxiv.org/pdf/1312.6082.pdf)</h2>
+        <a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h3>
 <a id="multi-digit-number-recognition-from-street-view-imagery-using-deep-convolutional-neural-networks" class="anchor" href="#multi-digit-number-recognition-from-street-view-imagery-using-deep-convolutional-neural-networks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Multi-digit Number Recognition from Street View Imagery using Deep Convolutional Neural Networks.</h3>
 
 <p>This deep learning model follows the <a href="http://arxiv.org/abs/1312.6082">2014 paper by Goodfellow et al.</a>, which allows an end to end multiple digits classification for numbers of up to 5 digits. The model extracts a 4096 nodes feature vector using a CNN network and then applies 6 linear classifiers on it - one classifier for the length of the number and 5 classifiers for the individual digits.
@@ -36,6 +45,11 @@ The model can be applied for numbers OCR for up to 5 digits in blurry, rotated a
 <li>An evaluation script - eval.lua
 It is possible to train the model or use a supplied trained model which achieves 95.4% accuracy.</li>
 </ul>
+
+<h3>
+<a id="trained-model" class="anchor" href="#trained-model" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Trained Model</h3>
+
+<p>The trained model can be downloaded from <a href="http://www.terminet.xyz/datasets/model.zip">http://www.terminet.xyz/datasets/model.zip</a></p>
 
 <h3>
 <a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h3>
@@ -60,14 +74,24 @@ It is possible to train the model or use a supplied trained model which achieves
 
 <pre><code>th eval.lua -load 'model.net' -image 'data/1.png'
 </code></pre>
+        </section>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch">Multi-Digit Number Extraction from Images Using Deep Learning for Torch</a> is maintained by <a href="https://github.com/itaicaspi">itaicaspi</a>.</span>
+        <aside id="sidebar">
+          <a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
 
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
+          <p class="repo-owner"><a href="https://github.com/itaicaspi/SVHN-Multi-Digit-torch"></a> is maintained by <a href="https://github.com/itaicaspi">itaicaspi</a>.</p>
 
-    </section>
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
 
   
   </body>
