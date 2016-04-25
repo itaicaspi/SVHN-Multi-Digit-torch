@@ -24,6 +24,8 @@ cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
 cmd:option('-momentum', 0.9, 'momentum (SGD only)') 
 cmd:option('-type', 'cuda', 'use cuda')
 cmd:option('-transfer', 'relu', 'activation function, options are: elu, relu')
+cmd:option('-train', true, 'train the model')
+cmd:option('-test', true, 'test the model')
 cmd:text()
 opt = cmd:parse(arg or {})
 
@@ -164,7 +166,7 @@ local function train()
 		local targets = trainSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
 		
     -- get sequences lengths (actually length+1)
-    _, length = torch.max(targets, 1)
+    local _, length = torch.max(targets, 1)
     length = length[1]		
     length[length:gt(maxDigits)] = maxDigits
     
@@ -192,41 +194,6 @@ local function train()
 			-- forward
       local output = model:forward(inputs)
 			
-      
-      --[[ 
-      -- get number with max probability
-			local prob = torch.Tensor(opt.batchSize, lengthClasses) -- the probability for the number and length  
-      local number = torch.Tensor(opt.batchSize, maxDigits):zero()
-			local numberProb = 1
-			
-      -- get actual predicted sequence
-      for b = 1, opt.batchSize do
-				for i = 1, lengthClasses do
-          -- find the target sequence length
-          if targets[i][b] == 11 and length[b] == 0 then
-            length[b] = i-1
-          end
-          
-					local maxProbs, maxIdx
-					if i > 1 then
-						if i > maxDigits + 1 then -- the last class is for "> maxDigits"
-							maxProbs = 1
-							maxIdx = 1
-						else
-							-- the digit with the highest probability
-							local _maxProbs, _maxIdx = torch.max(output[i][b], 1)
-              maxProbs = _maxProbs[1]
-              maxIdx = _maxIdx[1]
-              number[b][i-1] = maxIdx - 1      
-            end
-						numberProb = numberProb * maxProbs
-						prob[b][i] = output[1][b][i] * numberProb
-					end
-          
-				end
-			end
-      ]]--
-      
       -- get error from criterion for length net
 			local gradInput = {}
       if opt.type == 'cuda' then
@@ -289,13 +256,13 @@ local function test()
 		xlua.progress(t, testSize)
 		
 		-- get batch
-		inputs = testSet.data:index(1, shuffle:sub(t, t + opt.batchSize - 1):long())
-		targets = testSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
+		local inputs = testSet.data:index(1, shuffle:sub(t, t + opt.batchSize - 1):long())
+		local targets = testSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
 		
     -- get sequences lengths (actually length+1)
-    _, length = torch.max(targets, 1)
+    local _, length = torch.max(targets, 1)
     length = length[1]		
-    
+    length[length:gt(maxDigits)]=maxDigits
     --image.save('/home/itaic/Documents/test.png', inputs[1])
     --print(targets[{{},{1}}])
     
@@ -316,13 +283,16 @@ local function test()
   print(confusion)
 end
 
-for e = 1, opt.epochs do
-  train()
-  test()
+for e = 1, 1 do --opt.epochs do
+  if opt.train then train() end
+  
   -- save/log current net
+  if opt.save ~= '' then
   local filename = opt.save--paths.concat(opt.save, 'model.net')
   os.execute('mkdir -p ' .. sys.dirname(filename))
   print('==> saving model to '..filename)
   torch.save(filename, model)
-  
+  end
+
+  if opt.test then test() end
 end
