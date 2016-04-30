@@ -34,17 +34,17 @@ local maxDigits = lengthClasses - 2 -- class 7 is "> maxDigits"
 local digitClasses = 10
 
 local function convLayer(nInput, nOutput, stride)
-	local kW = 5
-	local kH = 5
-	local padW = (kW - 1)/2
-	local padH = (kH - 1)/2
-	local layer = nn.Sequential()
-	layer:add(nn.SpatialConvolution(nInput, nOutput, kW, kH, 1, 1, padW, padH))
-	layer:add(nn.SpatialMaxPooling(2, 2, stride, stride, 1, 1))
-	layer:add(nn.SpatialBatchNormalization(nOutput))
-	layer:add(nn.ReLU())
-	layer:add(nn.Dropout(0.2))
-	if opt.type == 'cuda' then
+  local kW = 5
+  local kH = 5
+  local padW = (kW - 1)/2
+  local padH = (kH - 1)/2
+  local layer = nn.Sequential()
+  layer:add(nn.SpatialConvolution(nInput, nOutput, kW, kH, 1, 1, padW, padH))
+  layer:add(nn.SpatialMaxPooling(2, 2, stride, stride, 1, 1))
+  layer:add(nn.SpatialBatchNormalization(nOutput))
+  layer:add(nn.ReLU())
+  layer:add(nn.Dropout(0.2))
+  if opt.type == 'cuda' then
     return layer:cuda()
   else
     return layer
@@ -72,10 +72,10 @@ extractor:add(nn.Linear(3072, 4096)) -- H
 
 --[[CLASSIFIER - classifies one digit ]]--
 local function classifier(classes)
-	local classifier = nn.Sequential()
-	classifier:add(nn.Linear(4096, classes))
-	classifier:add(nn.LogSoftMax())
-	if opt.type == 'cuda' then
+  local classifier = nn.Sequential()
+  classifier:add(nn.Linear(4096, classes))
+  classifier:add(nn.LogSoftMax())
+  if opt.type == 'cuda' then
     return classifier:cuda()
   else
     return classifier
@@ -87,7 +87,7 @@ sequencer = nn.ConcatTable()
 sequencer:add(lengthPredictor)
 sequencer:add(classifier(lengthClasses)) -- length predictor
 for i = 1, maxDigits do
-	sequencer:add(classifier(digitClasses)) -- digit class predictor
+  sequencer:add(classifier(digitClasses)) -- digit class predictor
 end
 
 --[[MODEL]]--
@@ -148,22 +148,22 @@ end
 TrainError = 0
 
 local function train()
-	-- epochs tracking
-	epoch = epoch or 1
+  -- epochs tracking
+  epoch = epoch or 1
 
-	model:training() -- for dropout
-	model:zeroGradParameters()
+  model:training() -- for dropout
+  model:zeroGradParameters()
 	
   local confusion = optim.ConfusionMatrix(10)
   
-	shuffle = torch.randperm(trainSize)
-	for t = 1, trainSize - opt.batchSize, opt.batchSize do
-		-- display progress
-		xlua.progress(t, trainSize)
+  shuffle = torch.randperm(trainSize)
+  for t = 1, trainSize - opt.batchSize, opt.batchSize do
+    -- display progress
+    xlua.progress(t, trainSize)
 		
-		-- get batch
-		local inputs = trainSet.data:index(1, shuffle:sub(t, t + opt.batchSize - 1):long())
-		local targets = trainSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
+    -- get batch
+    local inputs = trainSet.data:index(1, shuffle:sub(t, t + opt.batchSize - 1):long())
+    local targets = trainSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
 		
     -- get sequences lengths (actually length+1)
     local _, length = torch.max(targets, 1)
@@ -179,23 +179,23 @@ local function train()
     end
     
     -- evaluation function for optim
-		local feval = function(x)
-			-- get new parameters
-			if x ~= parameters then
-				parameters:copy(x)
-			end
+    local feval = function(x)
+      -- get new parameters
+      if x ~= parameters then
+        parameters:copy(x)
+      end
       
       -- reset gradients
-			gradParameters:zero()
+      gradParameters:zero()
+      
+      -- batch error accumulator
+      local f = 0
 			
-			-- batch error accumulator
-			local f = 0
-			
-			-- forward
+      -- forward
       local output = model:forward(inputs)
 			
       -- get error from criterion for length net
-			local gradInput = {}
+      local gradInput = {}
       if opt.type == 'cuda' then
         gradInput[1] = torch.Tensor(opt.batchSize, lengthClasses):zero():cuda()
         for i = 1,maxDigits do
@@ -211,22 +211,22 @@ local function train()
       --print(targets)
       for b = 1, opt.batchSize do
         -- get gradients for the length tower
-				local err = criterion:forward(output[1][b], length[b])
+        local err = criterion:forward(output[1][b], length[b])
         gradInput[1][b] = criterion:backward(output[1][b], length[b])    
         f = f + err
         -- get gradients for each one of the digit towers
-				for i = 1, length[b]-1 do
+        for i = 1, length[b]-1 do
           local err = criterion:forward(output[i+1][b], targets[i][b])
           confusion:add(output[i+1][b], targets[i][b])
           gradInput[i+1][b] = criterion:backward(output[i+1][b], targets[i][b])
           f = f + err
         end
-			end
-			model:backward(inputs, gradInput)
+      end
+      model:backward(inputs, gradInput)
       
       -- average gradients and error
-			gradParameters:div(opt.batchSize)
-			f = f / opt.batchSize
+      gradParameters:div(opt.batchSize)
+      f = f / opt.batchSize
 			
       TrainError = f
       
@@ -234,14 +234,14 @@ local function train()
       --print(confusion)
       --print('Train Error = ' .. TrainError .. '\n')  
       return f, gradParameters
-		end
+    end
 		
-		optimMethod(feval, parameters, optimState)
+    optimMethod(feval, parameters, optimState)
     
     collectgarbage('collect')
 
-	end
-	print(confusion)
+  end
+  print(confusion)
   print('Train Error = ' .. TrainError .. '\n')  
 end
 
@@ -250,14 +250,14 @@ local function test()
   
   local confusion = optim.ConfusionMatrix(10)
   
-	shuffle = torch.randperm(testSize)
-	for t = 1, testSize - opt.batchSize, opt.batchSize do
-		-- display progress
-		xlua.progress(t, testSize)
+  shuffle = torch.randperm(testSize)
+  for t = 1, testSize - opt.batchSize, opt.batchSize do
+    -- display progress
+    xlua.progress(t, testSize)
 		
-		-- get batch
-		local inputs = testSet.data:index(1, shuffle:sub(t, t + opt.batchSize - 1):long())
-		local targets = testSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
+    -- get batch
+    local inputs = testSet.data:index(1, shuffle:sub(t, t + opt.batchSize - 1):long())
+    local targets = testSet.labels:index(1, shuffle:sub(t, t + opt.batchSize - 1):long()):transpose(1,2)  
 		
     -- get sequences lengths (actually length+1)
     local _, length = torch.max(targets, 1)

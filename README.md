@@ -6,4 +6,11 @@ http://www.terminet.xyz/datasets/model.zip
 
 The trained model achieves 95.4% accuracy on the test set and was trained for 3 days.
 
-For more information please refer to http://itaicaspi.github.io/SVHN-Multi-Digit-torch/
+Run eval.lua to classify a single input image.
+
+Requirements:
+* optim
+* nn
+* cudnn, cunn, cutorch
+* dp
+* rnn
