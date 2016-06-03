@@ -14,3 +14,5 @@ Requirements:
 * cudnn, cunn, cutorch
 * dp
 * rnn
+
+More info at: http://itaicaspi.github.io/SVHN-Multi-Digit-torch/
